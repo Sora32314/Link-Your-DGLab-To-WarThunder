@@ -23,7 +23,7 @@ JSON_FIELDS_INDICATORS = [
     "engine_broken",  # 发动机是否损坏
     "engine_dead",  # 发动机是否完全失效
     "v_drive_broken",  # 高低机装置是否损坏
-    "h_drive_broken",  # 水平炮塔驱动装置是否损坏
+    "h_drive_broken",  # 方向机是否损坏
     "transmission_broken",  # 传动是否受损
     "track_broken",  # 履带是否断裂
     "barrel_dead",  # 炮管是否损坏
