@@ -1,6 +1,5 @@
 from Cython.Utility.Dataclasses import Field
 import asyncio
-from DGLab_WT_Lib import DataStorage
 
 READ_CHUNK_SIZE = 4096      #已弃用
 
@@ -85,8 +84,7 @@ MAX_STRENGTH = 0
 
 
 
-#创建储存类实例
-Data_Storage_Instance = DataStorage()
+
 
 
 

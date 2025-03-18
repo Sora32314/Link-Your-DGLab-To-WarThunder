@@ -12,19 +12,21 @@ import aiohttp
 import async_timeout
 
 
-from GobalVar import JSON_FIELDS_INDICATORS, REQUIRED_JSON_FIELDS_INDICATORS, data_queue, Data_Storage_Instance as DSI
+from GobalVar import JSON_FIELDS_INDICATORS, REQUIRED_JSON_FIELDS_INDICATORS, data_queue
 #保留data_queue，保持一部分未来的拓展性。但是data_queue在实际上已弃用
+
+
 
 class DataStorage:
     def __init__(self):
-        self.__data = None
+        self.__data = []
         self.__data_json = None
 
     async def data_update(self):
         while True:
             try:
                 self.__data = await get_result()
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.015)
             except asyncio.CancelledError:
                 print("数据更新服务已被关闭！")
             except Exception as e:
@@ -35,32 +37,39 @@ class DataStorage:
         while True:
             try:
                 self.__data_json = await json_capture()
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(0.015)
             except asyncio.CancelledError:
                 print("Json更新服务已被关闭！")
             except Exception as e:
                 print(f"json_update发生错误：{e}")
 
-    def get_data(self):
+    async def get_data(self):
         return self.__data
 
-    def get_json(self):
+    async def get_json(self):
         return self.__data_json
-
 
 
 async def json_capture():
     try:
-        res = None
-        for data in await DSI.get_data():
-            if data[1] is not None:
-                res = json_parser(data[1])
+        res = []
+        data = await DSI.get_data()
+
+        if not data:
+            return res
+
+        for item in data:
+            if item[1] is not None and item[1] != { "valid": False }:
+                res = json_parser(item[1])
+                #print(f"解析出的数据：{res}")                                             测试
         return res
     except Exception as e:
-        print(f"在获取data时发生了意料之外的错误：{e}")
-        logging.error(f"在获取data时发生了意料之外的错误：{e}")
+        print(f"在获取json时发生了意料之外的错误：{e}")
+        logging.error(f"在获取json时发生了意料之外的错误：{e}")
 
-
+#创建储存类实例
+Data_Storage_Instance = DataStorage()
+DSI = Data_Storage_Instance
 
 
 #获取response信息，提取数据
@@ -100,8 +109,10 @@ async def get_result():
 async def data_printer(data_storage):
     while True:
         try:
-            print(f"输出内容：{data_storage.get_data()}")
-            print(f"输出内容：{data_storage.get_json()}")
+            for data in await data_storage.get_data():
+                if data is not None:
+                    print(f"DATA输出内容：{await data_storage.get_data()}")
+                    print(f"JSON输出内容：{await data_storage.get_json()}")
             #让出操控权
             await asyncio.sleep(0.005)
         except asyncio.CancelledError:
@@ -136,7 +147,7 @@ def json_parser(json):
 #数据清理
 def progress_clear(data_queue_):
     print(f"{data_queue_}已被清理完毕！")
-    data_queue_ = 0
+    data_queue_.clear()
 
 
 

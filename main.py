@@ -13,7 +13,8 @@ import async_timeout
 
 from DGLab_WT_Lib import data_printer, progress_clear, json_parser, json_capture
 #自定义包
-from GobalVar import DATA_SIZE_QUEUE, data_queue, Data_Storage_Instance as DSI
+from GobalVar import DATA_SIZE_QUEUE, data_queue
+from DGLab_WT_Lib import Data_Storage_Instance as DSI
 
 import DGLab_WT_Lib
 import Bleak_DGLab
