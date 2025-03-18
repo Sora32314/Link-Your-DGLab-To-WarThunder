@@ -1,9 +1,15 @@
 from Cython.Utility.Dataclasses import Field
+import asyncio
+from DGLab_WT_Lib import DataStorage
 
-READ_CHUNK_SIZE = 4096
+READ_CHUNK_SIZE = 4096      #已弃用
 
-DATA_SIZE_QUEUE = 128
+DATA_SIZE_QUEUE = 128       #已弃用
 
+
+#数据队列
+data_queue = asyncio.Queue(maxsize=DATA_SIZE_QUEUE)
+#保留data_queue，保持一部分未来的拓展性。但是data_queue在实际上已弃用
 
 
 #获取JSON信息字段
@@ -69,3 +75,24 @@ REQUIRED_JSON_FIELDS_INDICATORS  = ["army", "crew_total", "crew_current"]
             json.get("stabilizer")  #稳定器
         ]
 """
+
+
+
+
+
+#郊狼映射强度上限
+MAX_STRENGTH = 0
+
+
+
+#创建储存类实例
+Data_Storage_Instance = DataStorage()
+
+
+
+
+
+
+
+
+

@@ -11,10 +11,15 @@ import time
 #import cchardet
 import async_timeout
 
-from DGLab_WT_Lib import data_capture, data_printer, progress_clear, json_parser
+from DGLab_WT_Lib import data_printer, progress_clear, json_parser, json_capture
 #自定义包
-from GobalVar import DATA_SIZE_QUEUE
+from GobalVar import DATA_SIZE_QUEUE, data_queue, Data_Storage_Instance as DSI
+
 import DGLab_WT_Lib
+import Bleak_DGLab
+from Bleak_DGLab import init_
+
+
 
 #对于初次使用python并且阅读到此处的用户：在Python中，多线程拥有全局解释器锁（GIL），因此并不能并行运行，只能够并发运行，因此对于IO密集型任务，\
 #我们可以用协程来模拟多线程运行，协程的速度在Python的IO密集型任务中与多线程效率大致相当。
@@ -40,12 +45,12 @@ def async_timeit(func):
 
 
 #主函数
-async def main():
-    data_queue = asyncio.Queue(maxsize=DATA_SIZE_QUEUE)
+async def main_():
 
     tasks = [
-        asyncio.create_task(data_capture(data_queue)),
-        asyncio.create_task(data_printer(data_queue))
+        asyncio.create_task(DSI.data_update()),
+        asyncio.create_task(DSI.json_update()),
+        asyncio.create_task(data_printer(DSI))
     ]
 
     await asyncio.sleep(3)
@@ -55,8 +60,6 @@ async def main():
 
     await asyncio.gather(*tasks, return_exceptions=True)
 
-    #数据清理（虽然好像Python不用这样做数据清理？要做吗？）
-    progress_clear(data_queue)
 
 
 
@@ -67,8 +70,8 @@ async def main():
 
 #入口函数
 if __name__ == "__main__":
-    asyncio.run(main())
-
+    asyncio.run(main_())
+    #asyncio.run(init_())
 
 
 
