@@ -1,5 +1,5 @@
 
-import asyncio
+"""import asyncio
 from platform import system
 
 import pydglab
@@ -15,7 +15,7 @@ from GobalVar import data_queue
 logging.basicConfig(
     level=logging.INFO,
     format = '%(asctime)s - [%(levelname)s]:%(message)s',
-    filename='./logs.log'
+    filename='./logs/App.log'
 )
 
 
@@ -64,14 +64,13 @@ async def init_():
         await instance_.set_wave_sync(
             1, 9, 20, 5, 35, 20
         )
+
+
+
         logging.info(f"波形参数设置完成：{1, 9, 20, 5, 35, 20}")
     except Exception as e:
         logging.error(f"设置波形时出错，错误信息：{e}")
-        return
-
-
-    while True:
-        await json_parser(data_queue.get())
+        return"""
 
 
 
@@ -86,8 +85,11 @@ async def init_():
 
 
 
-if __name__ == "__main__":
-    asyncio.run(init_())
+
+
+
+"""if __name__ == "__main__":
+    asyncio.run(init_())"""
 
 
 

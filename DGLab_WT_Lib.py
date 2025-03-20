@@ -16,7 +16,7 @@ from GobalVar import JSON_FIELDS_INDICATORS, REQUIRED_JSON_FIELDS_INDICATORS, da
 #保留data_queue，保持一部分未来的拓展性。但是data_queue在实际上已弃用
 
 
-
+#一般通过存储结构
 class DataStorage:
     def __init__(self):
         self.__data = []
@@ -29,6 +29,7 @@ class DataStorage:
                 await asyncio.sleep(0.015)
             except asyncio.CancelledError:
                 print("数据更新服务已被关闭！")
+                return
             except Exception as e:
                 print(f"data_update发生错误：{e}")
 
@@ -40,6 +41,7 @@ class DataStorage:
                 await asyncio.sleep(0.015)
             except asyncio.CancelledError:
                 print("Json更新服务已被关闭！")
+                return
             except Exception as e:
                 print(f"json_update发生错误：{e}")
 
@@ -48,6 +50,32 @@ class DataStorage:
 
     async def get_json(self):
         return self.__data_json
+
+
+
+#创建储存类实例
+Data_Storage_Instance = DataStorage()
+DSI = Data_Storage_Instance
+
+
+class DGLabInstanceController:
+    def __init__(self, instance_):
+        self.__instance = instance_
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 async def json_capture():
@@ -66,10 +94,6 @@ async def json_capture():
     except Exception as e:
         print(f"在获取json时发生了意料之外的错误：{e}")
         logging.error(f"在获取json时发生了意料之外的错误：{e}")
-
-#创建储存类实例
-Data_Storage_Instance = DataStorage()
-DSI = Data_Storage_Instance
 
 
 #获取response信息，提取数据
@@ -107,16 +131,16 @@ async def get_result():
 
 #在控制台进行内容输出
 async def data_printer(data_storage):
-    while True:
-        try:
+    try:
+        while True:
             for data in await data_storage.get_data():
                 if data is not None:
                     print(f"DATA输出内容：{await data_storage.get_data()}")
                     print(f"JSON输出内容：{await data_storage.get_json()}")
             #让出操控权
             await asyncio.sleep(0.005)
-        except asyncio.CancelledError:
-            print("数据输出任务已被关闭！")
+    except asyncio.CancelledError:
+        print("数据输出任务已被关闭！")
 
 
 #Json解析
