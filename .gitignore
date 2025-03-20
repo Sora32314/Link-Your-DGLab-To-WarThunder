@@ -3,4 +3,4 @@ __pycache__/
 .git/
 .gitignore
 ./logs/App.log
-logs
+logs/Bleak.log
