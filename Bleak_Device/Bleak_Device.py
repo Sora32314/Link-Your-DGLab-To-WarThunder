@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from contextlib import nullcontext
 from dataclasses import dataclass
 from time import sleep
 from tkinter.font import names
@@ -71,7 +72,7 @@ class BleakDevice:
         因为对蓝牙协议的了解不足，只能使用with进行自动管理。
         
         2025/4/1 更新：是的，无法正常断开连接的原因是当Windows系统配对蓝牙设备之后，系统会认为系统需要长时间与蓝牙设备保持连接/
-        而程序的权限不足以绕开Windows的管理，所以根本无法在配对的情况下断开连接，于是换回手动连接
+        而程序的权限不足以绕开Windows的管理，所以根本无法在配对的情况下断开连接，于是换回手动连接。
         """
         self.client = BleakClient(self.device, timeout = _timeout, winrt=dict(use_cached_services=False))
         await self.client.connect()
@@ -86,7 +87,9 @@ class BleakDevice:
 
             #保持连接，每循环占用50ms
             while True:
-                await asyncio.sleep(0.05)
+                await asyncio.sleep(0.5)
+                if not self.__connection__:
+                    break
 
         except BleakError as e:
             logging.warning(f"{e}")
@@ -102,6 +105,22 @@ class BleakDevice:
             await self.client.disconnect()
             return True
 
+    #拼写控制命令
+    @staticmethod
+    def make_command_hex(cmd):
+        command = None
+
+        try:
+            command = bytes.fromhex(
+                cmd
+            )
+            return command
+        except asyncio.CancelledError:
+            return command
+
+        except Exception as e:
+            logging.warning(f"拼写控制命令出错： “{e}” 命令： {cmd} 无法被转换为HEX或其他错误。")
+            return command
 
     #对UUID写入消息
     async def writing(self, uuid, message, _timeout: float = 25):
@@ -139,6 +158,7 @@ class BleakDevice:
             print(e)
             return
 
+    #获取服务并打印
     async def print_service(self):
         if self is not None:
             services = self.client.services
@@ -149,13 +169,16 @@ class BleakDevice:
                     write = "write" in char.properties
                     notify = "notify" in char.properties
                     print(f"  特征值 UUID: {char.uuid} (可读: {read}, 可写: {write}， 通知：{notify})， 描述：{char.description}")
+        return
 
+    #获取存在的服务
     async def get_service(self, uuid: str):
         if self is not None:
             for service in self.client.services:
                 if service.uuid == uuid:
                     return service
 
+    #获取存在的特征值
     async def get_characteristic(self, uuid: str):
         if self is not None:
             for service in self.client.services:
@@ -163,6 +186,16 @@ class BleakDevice:
                     if char.uuid == uuid:
                         return char
 
+    #获取设备名称
+    async def get_device_name(self):
+        return self.device.name
+
+    #关机
+    async def shutdown(self):
+        self.__connection__ = False
+        return
+
+    #清理
     async def __clean__(self):
         if self is not None and len(self.uuid) > 0 and self.client is not None:
             print("清理中......")
@@ -172,11 +205,15 @@ class BleakDevice:
                 print(f"清理：{item}")
                 await self.client.stop_notify(item)
             print("清理完毕！")
+        return
 
+    #检查连接
     async def __check_connection__(self):
         while not self.__connection__:
             await asyncio.sleep(0.5)
         return True
+
+
 
 
 def callback_handler(sender, data):
@@ -184,11 +221,13 @@ def callback_handler(sender, data):
     print(f"发送者：{sender}，收到数据：{data}")
     try:
         decoded_data = data.decode("gb2312")
-        print(f"解码后数据：{decoded_data}")
+        print(f"解码前数据：{data}，解码后数据：{decoded_data}")
     except UnicodeDecodeError:
         print("无法解析字符串！")
+
     except Exception as e:
         print(f"发现未知错误：{e}")
+
 
 
 
@@ -200,9 +239,7 @@ async def run():
 
     await instance.listening(UUID_V3.Notify_Characteristic)
 
-    command_str  = bytes.fromhex(
-        "B0000505"
-    )
+    command_str = instance.make_command_hex("B0000505")
 
     await instance.writing(UUID_V3.Write_Characteristic, command_str)
 

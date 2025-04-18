@@ -20,6 +20,7 @@ class UUID_V3:
     Notify_Characteristic:                  str = "0000150b-0000-1000-8000-00805f9b34fb"
 
 
+#暂未支持
 @dataclass(frozen=True)
 class UUID_V2:
     NULL:                                str = "NULL"
