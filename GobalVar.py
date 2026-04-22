@@ -80,7 +80,7 @@ REQUIRED_JSON_FIELDS_INDICATORS  = ["army", "crew_total", "crew_current"]
 
 
 #郊狼映射强度上限
-MAX_STRENGTH = 0
+MAX_STRENGTH = 200
 
 
 

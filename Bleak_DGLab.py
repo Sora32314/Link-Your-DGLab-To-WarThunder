@@ -47,8 +47,8 @@ class Bleak_DGLab_V3_Controller:
             self.shutdown()
 
         self.operator = instance
-        self.Channel_A = Channel_A
-        self.Channel_B = Channel_B
+        self.Channel_A = Channel_A()
+        self.Channel_B = Channel_B()
 
 
 
@@ -60,7 +60,7 @@ class Bleak_DGLab_V3_Controller:
             return
 
         if not (0 <= strength_a <= 200) or not (0 <= strength_b <= 200):
-            logging.warning(f"A通道或B通道传入的强度值非法，请确保数值在[0-200]内。传入的强度值A：{strength_a}，传入的强度值B：{strength_b}。")
+            logging.warning(f"A通道或B通道传入的强度值非法，请确保数值在[0, 200]内。传入的强度值A：{strength_a}，传入的强度值B：{strength_b}。")
             return
 
         #设置段

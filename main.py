@@ -21,10 +21,6 @@ import Bleak_DGLab
 
 
 
-#对于初次使用python并且阅读到此处的用户：在Python中，多线程拥有全局解释器锁（GIL），因此并不能并行运行，只能够并发运行，因此对于IO密集型任务，\
-#我们可以用协程来模拟多线程运行，协程的速度在Python的IO密集型任务中与多线程效率大致相当。
-
-
 if sys.platform == 'win32':
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
